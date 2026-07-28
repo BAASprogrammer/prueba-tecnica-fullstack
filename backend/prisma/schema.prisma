@@ -1,19 +1,20 @@
+// Generador del cliente de Prisma
 generator client {
   provider = "prisma-client-js"
 }
-
+// Base de datos
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
-
+// Enum para estados de solicitud
 enum EstadoSolicitud {
   PENDIENTE
   EN_PROCESO
   FINALIZADA
   RECHAZADA
 }
-
+// Tabla de clientes
 model Cliente {
   id          Int         @id @default(autoincrement())
   nombre      String
@@ -26,7 +27,7 @@ model Cliente {
 
   @@index([email])
 }
-
+// Tabla de solicitudes
 model Solicitud {
   id          Int             @id @default(autoincrement())
   numero      String          @unique

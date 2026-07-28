@@ -1,8 +1,9 @@
 import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
-
+// Datos ficticios iniciales de clientes y solicitudes
 async function main() {
+  // Clientes de ejemplo
   const rodrigo = await prisma.cliente.create({
     data: { nombre: 'Rodrigo Alarcón', email: 'rodrigo.alarcon@correo.cl', telefono: '+56911122233' },
   });
@@ -21,7 +22,7 @@ async function main() {
   const antonia = await prisma.cliente.create({
     data: { nombre: 'Antonia Sepúlveda', email: 'antonia.sepulveda@hotmail.com', telefono: '+56966677788' },
   });
-
+  // Solicitudes de ejemplo
   const solicitudes = [
     { numero: 'REQ-2026-001', tipo: 'Reclamo por servicio', descripcion: 'El técnico no llegó en el horario acordado y no hubo aviso previo', estado: 'PENDIENTE' as const, clienteId: rodrigo.id },
     { numero: 'REQ-2026-002', tipo: 'Consulta de contrato', descripcion: 'Necesita copia del contrato firmado el año pasado', estado: 'FINALIZADA' as const, clienteId: fernanda.id },
@@ -36,7 +37,7 @@ async function main() {
     { numero: 'REQ-2026-011', tipo: 'Consulta de contrato', descripcion: 'Solicita información sobre penalidad por término anticipado', estado: 'RECHAZADA' as const, clienteId: sebastian.id },
     { numero: 'REQ-2026-012', tipo: 'Solicitud de upgrade', descripcion: 'Quiere sumar servicio de streaming al plan actual', estado: 'FINALIZADA' as const, clienteId: antonia.id },
   ];
-
+  // Se insertan las solicitudes en la base de datos
   for (const solicitud of solicitudes) {
     await prisma.solicitud.create({ data: solicitud });
   }
