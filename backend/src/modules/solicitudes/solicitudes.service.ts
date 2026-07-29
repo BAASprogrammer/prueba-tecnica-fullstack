@@ -3,6 +3,48 @@ import { prisma } from '../../shared/prisma';
 import * as solicitudesRepository from './solicitudes.repository';
 import { NotFoundError, ValidationError } from '../../shared/errors';
 
+// Crear una solicitud
+export const create = async (data: {
+  fecha: string; tipo: string; descripcion: string; estado: string;
+  nombre: string; email: string; telefono: string;
+}) => {
+  // Buscar cliente por email o crearlo
+  let clienteId: number;
+  const existing = await prisma.$queryRaw<[{ id: number }]>`
+    SELECT id FROM "Clientes" WHERE email = ${data.email}
+  `;
+  if (existing[0]) {
+    // Cliente existe: actualizar datos
+    clienteId = existing[0].id;
+    await prisma.$executeRaw`
+      UPDATE "Clientes" SET nombre = ${data.nombre}, telefono = ${data.telefono}, "updatedAt" = NOW()
+      WHERE id = ${clienteId}
+    `;
+  } else {
+    // Cliente no existe: crearlo
+    const rows = await prisma.$queryRaw<[{ id: number }]>`
+      INSERT INTO "Clientes" (nombre, email, telefono, "createdAt", "updatedAt")
+      VALUES (${data.nombre}, ${data.email}, ${data.telefono}, NOW(), NOW())
+      RETURNING id
+    `;
+    clienteId = rows[0].id;
+  }
+
+  // Generar número de solicitud autoincremental
+  const countResult = await prisma.$queryRaw<[{ total: bigint }]>`
+    SELECT COUNT(*) + 1 AS total FROM "Solicitudes"
+  `;
+  const nextNumber = String(Number(countResult[0].total)).padStart(3, '0');
+  const numero = `REQ-${new Date().getFullYear()}-${nextNumber}`;
+
+  // Crear la solicitud
+  const result = await solicitudesRepository.create({
+    numero, fecha: new Date(data.fecha), tipo: data.tipo,
+    descripcion: data.descripcion, estado: data.estado, clienteId,
+  });
+  return result;
+};
+
 // Obtener una solicitud por ID
 export const getById = async (id: number) => {
   return solicitudesRepository.findById(id);

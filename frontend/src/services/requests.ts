@@ -1,6 +1,7 @@
 import axios from 'axios';
 import type { PaginatedResponse, RequestItem, RequestFilters } from '../types/request';
 import type { EditRequestData } from '../types/edit-request-modal';
+import type { CreateRequestData } from '../types/create-request-modal';
 
 // Crear instancia de axios con la URL base
 const api = axios.create({ baseURL: '/solicitudes' });
@@ -15,6 +16,21 @@ api.interceptors.request.use((config) => {
 export const getRequests = async (page: number, pageSize: number, filters?: RequestFilters) => {
   const { data } = await api.get<PaginatedResponse>('/', { params: { page, pageSize, ...filters } });
   return data;
+};
+
+// Crea una nueva solicitud
+export const createRequest = async (data: CreateRequestData) => {
+  const body = {
+    fecha: data.date,
+    tipo: data.type,
+    descripcion: data.description,
+    estado: data.status,
+    nombre: data.clientName,
+    email: data.clientEmail,
+    telefono: data.clientPhone,
+  };
+  const { data: res } = await api.post<RequestItem>('/', body);
+  return res;
 };
 
 // Edita una solicitud (puede modificar cualquier campo)

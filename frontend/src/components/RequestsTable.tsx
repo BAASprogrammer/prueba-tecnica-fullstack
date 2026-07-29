@@ -4,7 +4,8 @@ import type { PropsRequestsTable } from '../types/request';
 
 export default function RequestsTable({
   requests, loading, total, page, totalPages,
-  expanded, onPageChange, onToggleExpand, onCloseRequest, onDeleteRequest, onEditRequest,
+  expanded, disabledEditIds,
+  onPageChange, onToggleExpand, onCloseRequest, onDeleteRequest, onEditRequest,
 }: PropsRequestsTable) {
   return (
     <div className="bg-white rounded-xl shadow-sm border overflow-hidden">
@@ -85,7 +86,13 @@ export default function RequestsTable({
                     </td>
                     <td className="px-4 py-2.5 whitespace-nowrap border-b border-gray-200">
                       <div className="flex items-center gap-2">
-                        <button onClick={() => onEditRequest(r.id)} className="text-gray-400 hover:text-blue-600 transition-colors cursor-pointer" title="Editar solicitud" aria-label="Editar solicitud">
+                        <button
+                          onClick={() => onEditRequest(r.id)}
+                          disabled={disabledEditIds.has(r.id)}
+                          className="text-gray-400 hover:text-blue-600 transition-colors disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
+                          title={disabledEditIds.has(r.id) ? 'Siendo editada en otra pestaña' : 'Editar solicitud'}
+                          aria-label="Editar solicitud"
+                        >
                           <Pencil className="w-4 h-4" />
                         </button>
                         <button

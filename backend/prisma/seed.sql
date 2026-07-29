@@ -17,26 +17,30 @@ SET row_security = off;
 -- Data for Name: Usuarios; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-INSERT INTO public."Usuarios" (id, email, password, nombre, rol, activo, "createdAt", "updatedAt") VALUES
-(1, 'admin@correo.cl', '$2b$10$.rP/v9GrSIwVCLaRSCCtIO1Vchs0OZ2GYlsrOnqrmv/ZkpzrIhIGK', 'Admin', 'admin', true, NOW(), NOW());
+INSERT INTO public."Usuarios" (id, email, password, nombre, rol, activo, "createdAt", "updatedAt")
+VALUES (1, 'admin@correo.cl', '$2b$10$.rP/v9GrSIwVCLaRSCCtIO1Vchs0OZ2GYlsrOnqrmv/ZkpzrIhIGK', 'Admin', 'admin', true, NOW(), NOW())
+ON CONFLICT (email) DO UPDATE SET password = EXCLUDED.password, nombre = EXCLUDED.nombre, rol = EXCLUDED.rol, activo = EXCLUDED.activo, "updatedAt" = NOW();
 
 --
 -- Data for Name: Clientes; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-INSERT INTO public."Clientes" (id, nombre, email, telefono, "createdAt", "updatedAt") VALUES
+INSERT INTO public."Clientes" (id, nombre, email, telefono, "createdAt", "updatedAt")
+VALUES
 (1, 'Rodrigo Alarcón', 'rodrigo.alarcon@correo.cl', '+56911122233', NOW(), NOW()),
 (2, 'Fernanda Espinoza', 'fernanda.espinoza@mail.com', '+56922233344', NOW(), NOW()),
 (3, 'Ignacio Bravo', 'ignacio.bravo@empresa.cl', '+56933344455', NOW(), NOW()),
 (4, 'Josefa Reyes', 'josefa.reyes@gmail.com', '+56944455566', NOW(), NOW()),
 (5, 'Sebastián Contreras', 'sebastian.contreras@outlook.com', '+56955566677', NOW(), NOW()),
-(6, 'Antonia Sepúlveda', 'antonia.sepulveda@hotmail.com', '+56966677788', NOW(), NOW());
+(6, 'Antonia Sepúlveda', 'antonia.sepulveda@hotmail.com', '+56966677788', NOW(), NOW())
+ON CONFLICT (email) DO UPDATE SET nombre = EXCLUDED.nombre, telefono = EXCLUDED.telefono, "updatedAt" = NOW();
 
 --
 -- Data for Name: Solicitudes; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-INSERT INTO public."Solicitudes" (id, numero, fecha, tipo, descripcion, estado, "clienteId", "createdAt", "updatedAt") VALUES
+INSERT INTO public."Solicitudes" (id, numero, fecha, tipo, descripcion, estado, "clienteId", "createdAt", "updatedAt")
+VALUES
 (1, 'REQ-2026-001', NOW(), 'Reclamo por servicio', 'El técnico no llegó en el horario acordado y no hubo aviso previo', 'PENDIENTE', 1, NOW(), NOW()),
 (2, 'REQ-2026-002', NOW(), 'Consulta de contrato', 'Necesita copia del contrato firmado el año pasado', 'FINALIZADA', 2, NOW(), NOW()),
 (3, 'REQ-2026-003', NOW(), 'Solicitud de upgrade', 'Quiere aumentar la velocidad de su plan actual', 'EN_PROCESO', 3, NOW(), NOW()),
@@ -48,7 +52,8 @@ INSERT INTO public."Solicitudes" (id, numero, fecha, tipo, descripcion, estado, 
 (9, 'REQ-2026-009', NOW(), 'Cambio de titular', 'Cambio de domicilio con mantención del mismo número', 'EN_PROCESO', 3, NOW(), NOW()),
 (10, 'REQ-2026-010', NOW(), 'Reclamo por servicio', 'Factura llegó con un monto distinto al plan contratado', 'PENDIENTE', 4, NOW(), NOW()),
 (11, 'REQ-2026-011', NOW(), 'Consulta de contrato', 'Solicita información sobre penalidad por término anticipado', 'RECHAZADA', 5, NOW(), NOW()),
-(12, 'REQ-2026-012', NOW(), 'Solicitud de upgrade', 'Quiere sumar servicio de streaming al plan actual', 'FINALIZADA', 6, NOW(), NOW());
+(12, 'REQ-2026-012', NOW(), 'Solicitud de upgrade', 'Quiere sumar servicio de streaming al plan actual', 'FINALIZADA', 6, NOW(), NOW())
+ON CONFLICT (numero) DO UPDATE SET fecha = EXCLUDED.fecha, tipo = EXCLUDED.tipo, descripcion = EXCLUDED.descripcion, estado = EXCLUDED.estado, "clienteId" = EXCLUDED."clienteId", "updatedAt" = NOW();
 
 --
 -- Set sequence values

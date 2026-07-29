@@ -21,6 +21,59 @@ export const getAll = async (req: Request, res: Response) => {
   }
 };
 
+// Crear una solicitud
+export const create = async (req: Request, res: Response) => {
+  try {
+    // Extrae los campos del cuerpo de la solicitud
+    const { fecha, tipo, descripcion, estado, nombre, email, telefono } = req.body;
+
+    // Validar fecha
+    if (!fecha || isNaN(new Date(fecha).getTime())) {
+      res.status(400).json({ error: 'La fecha es obligatoria y debe ser válida' });
+      return;
+    }
+    // Validar tipo
+    if (!tipo || !tipo.toString().trim()) {
+      res.status(400).json({ error: 'El tipo de solicitud es obligatorio' });
+      return;
+    }
+    // Validar descripción
+    if (!descripcion || !descripcion.toString().trim()) {
+      res.status(400).json({ error: 'La descripción es obligatoria' });
+      return;
+    }
+    // Validar estado
+    const validStates = ['PENDIENTE', 'EN_PROCESO', 'FINALIZADA', 'RECHAZADA'];
+    if (!estado || !validStates.includes(estado)) {
+      res.status(400).json({ error: 'Estado inválido' });
+      return;
+    }
+    // Validar nombre del cliente
+    if (!nombre || !nombre.toString().trim()) {
+      res.status(400).json({ error: 'El nombre del cliente es obligatorio' });
+      return;
+    }
+    // Validar email
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      res.status(400).json({ error: 'Email inválido' });
+      return;
+    }
+    // Validar teléfono
+    if (!telefono || !/^\+569\d{8}$/.test(telefono.toString())) {
+      res.status(400).json({ error: 'El teléfono debe tener formato +56912345678' });
+      return;
+    }
+
+    // Llama al servicio para crear la solicitud
+    const result = await solicitudesService.create({ fecha, tipo, descripcion, estado, nombre, email, telefono });
+    // Retorna el resultado con estado 201: Created
+    res.status(201).json(result);
+  } catch (error) {
+    // Retorna estado 500: Internal Server Error
+    res.status(500).json({ error: 'Error al crear solicitud' });
+  }
+};
+
 // Eliminar una solicitud
 export const remove = async (req: Request, res: Response) => {
   try {

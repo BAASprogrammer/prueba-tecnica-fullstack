@@ -1,11 +1,13 @@
 import { useAuth } from '../hooks/useAuth';
-import { LogOut, User, CheckCircle2, AlertCircle, Search, ArrowUpDown } from 'lucide-react';
+import { LogOut, User, CheckCircle2, AlertCircle, Search, ArrowUpDown, Plus, Lock } from 'lucide-react';
 import RequestsTable from '../components/RequestsTable';
 import StatsCards from '../components/StatsCards';
 import EditRequestModal from '../components/EditRequestModal';
+import CreateRequestModal from '../components/CreateRequestModal';
 import { useDashboard } from '../hooks/useDashboard';
 import { useRequests } from '../hooks/useRequests';
 import { useFlashMessage } from '../hooks/useFlashMessage';
+import { useTabLock } from '../hooks/useTabLock';
 
 export default function Dashboard() {
   // Hook de autenticación
@@ -14,15 +16,42 @@ export default function Dashboard() {
   const { stats, refreshStats } = useDashboard();
   // Hook de mensajes flash
   const { message, showMessage } = useFlashMessage();
+  // Hook de bloqueo entre pestañas
+  const { lockedCreate, lockedEditIds, acquireLock, releaseLock } = useTabLock();
   // Hook de gestión de solicitudes
   const {
-    requests, loading, page, totalPages, total, expanded, filters, editRequestItem,
-    setPage, setExpanded, updateFilters,
+    requests, loading, page, totalPages, total, expanded, filters, editRequestItem, showCreateModal,
+    setPage, setExpanded, setShowCreateModal, updateFilters,
     confirmId, deleteConfirmId,
     handleCloseRequest, confirmClose, setConfirmId,
     handleDeleteRequest, confirmDelete, setDeleteConfirmId,
     handleEditRequest, saveEditRequest, setEditRequestItem,
+    handleCreateRequest,
   } = useRequests(refreshStats, showMessage);
+
+  // Abrir modal de creación con bloqueo entre pestañas
+  const openCreateModal = () => {
+    acquireLock('create');
+    setShowCreateModal(true);
+  };
+
+  const closeCreateModal = () => {
+    releaseLock('create');
+    setShowCreateModal(false);
+  };
+
+  // Abrir modal de edición con bloqueo entre pestañas
+  const openEditModal = (id: number) => {
+    acquireLock('edit', id);
+    handleEditRequest(id);
+  };
+
+  const closeEditModal = () => {
+    if (editRequestItem) {
+      releaseLock('edit', editRequestItem.id);
+    }
+    setEditRequestItem(null);
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
@@ -97,6 +126,16 @@ export default function Dashboard() {
               <ArrowUpDown className="w-4 h-4 text-gray-500" />
               <span className="hidden sm:inline">{filters.orderBy === 'desc' ? 'Más reciente' : 'Más antiguo'}</span>
             </button>
+            {/* Botón para añadir solicitud */}
+            <button
+              onClick={openCreateModal}
+              disabled={lockedCreate}
+              className="flex items-center gap-2 px-4 py-2 text-sm font-medium bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer transition-colors"
+              title={lockedCreate ? 'Otra pestaña está creando una solicitud' : 'Añadir solicitud'}
+            >
+              {lockedCreate ? <Lock className="w-4 h-4" /> : <Plus className="w-4 h-4" />}
+              <span className="hidden sm:inline">{lockedCreate ? 'Bloqueado' : 'Añadir Solicitud'}</span>
+            </button>
           </div>
         </div>
 
@@ -124,12 +163,19 @@ export default function Dashboard() {
           </div>
         )}
 
+        {/* Modal de creación de solicitud */}
+        {showCreateModal && (
+          <CreateRequestModal
+            onSave={handleCreateRequest}
+            onClose={closeCreateModal}
+          />
+        )}
         {/* Modal de edición de solicitud */}
         {editRequestItem && (
           <EditRequestModal
             request={editRequestItem}
             onSave={saveEditRequest}
-            onClose={() => setEditRequestItem(null)}
+            onClose={closeEditModal}
           />
         )}
 
@@ -164,11 +210,12 @@ export default function Dashboard() {
           page={page}
           totalPages={totalPages}
           expanded={expanded}
+          disabledEditIds={lockedEditIds}
           onPageChange={setPage}
           onToggleExpand={setExpanded}
           onCloseRequest={handleCloseRequest}
           onDeleteRequest={handleDeleteRequest}
-          onEditRequest={handleEditRequest}
+          onEditRequest={openEditModal}
         />
       </main>
     </div>

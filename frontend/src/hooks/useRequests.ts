@@ -1,13 +1,14 @@
 import { useState, useEffect, useCallback } from 'react';
-import { getRequests, deleteRequest, editRequest } from '../services/requests';
+import { getRequests, deleteRequest, editRequest, createRequest } from '../services/requests';
 import type { RequestItem, RequestFilters } from '../types/request';
 import type { EditRequestData, FieldErrors } from '../types/edit-request-modal';
+import type { CreateRequestData } from '../types/create-request-modal';
 
 // Tamaño de la página
 const PAGE_SIZE = 4;
 
-// Validación del formulario de edición
-export const validateEditForm = (values: {
+// Validación del formulario (reutilizada para crear y editar)
+export const validateRequestForm = (values: {
   clientName: string; clientEmail: string; clientPhone: string;
   date: string; type: string; description: string;
 }): FieldErrors => {
@@ -35,6 +36,8 @@ export function useRequests(refreshStats: () => void, showMessage: (type: 'succe
   const [total, setTotal] = useState(0);
   // Estado de la descripción expandida
   const [expanded, setExpanded] = useState<number | null>(null);
+  // Estado del modal de creación
+  const [showCreateModal, setShowCreateModal] = useState(false);
   // Estado de los modales de confirmación
   const [confirmId, setConfirmId] = useState<number | null>(null);
   const [deleteConfirmId, setDeleteConfirmId] = useState<number | null>(null);
@@ -115,6 +118,24 @@ export function useRequests(refreshStats: () => void, showMessage: (type: 'succe
     if (req) setEditRequestItem(req);
   }, [requests]);
 
+  // Maneja la creación de una nueva solicitud
+  const handleCreateRequest = useCallback(async (data: CreateRequestData) => {
+    try {
+      await createRequest(data);
+      // Re-fetch page 1 para respetar el orden (fecha DESC) y la paginación
+      const res = await getRequests(1, PAGE_SIZE, filters);
+      setRequests(res.data);
+      setTotalPages(res.totalPages);
+      setTotal(res.total);
+      setPage(1);
+      showMessage('success', 'Solicitud creada correctamente.');
+      setShowCreateModal(false);
+      refreshStats();
+    } catch {
+      showMessage('error', 'Error al crear la solicitud.');
+    }
+  }, [showMessage, refreshStats, filters]);
+
   // Guarda los cambios de la edición
   const saveEditRequest = useCallback(async (id: number, data: EditRequestData) => {
     try {
@@ -130,11 +151,12 @@ export function useRequests(refreshStats: () => void, showMessage: (type: 'succe
 
   // Retorna los valores del hook
   return {
-    requests, loading, page, totalPages, total, expanded, filters, editRequestItem,
-    setPage, setExpanded, setTotal, updateFilters,
+    requests, loading, page, totalPages, total, expanded, filters, editRequestItem, showCreateModal,
+    setPage, setExpanded, setTotal, setShowCreateModal, updateFilters,
     confirmId, deleteConfirmId,
     handleCloseRequest, confirmClose, setConfirmId,
     handleDeleteRequest, confirmDelete, setDeleteConfirmId,
     handleEditRequest, saveEditRequest, setEditRequestItem,
+    handleCreateRequest,
   };
 }

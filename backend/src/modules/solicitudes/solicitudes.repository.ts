@@ -62,6 +62,20 @@ export const findAllPaginated = async (
   return { data: data.map(mapRequestRow), total: Number(countResult[0].total) };
 };
 
+// Crear una solicitud
+export const create = async (data: {
+  numero: string; fecha: Date; tipo: string; descripcion: string; estado: string; clienteId: number;
+}) => {
+  // Inserta la solicitud y obtiene el ID generado
+  const result = await prisma.$queryRaw<[{ id: number }]>`
+    INSERT INTO "Solicitudes" (numero, fecha, tipo, descripcion, estado, "clienteId", "createdAt", "updatedAt")
+    VALUES (${data.numero}, ${data.fecha}, ${data.tipo}, ${data.descripcion}, ${data.estado}::"EstadoSolicitud", ${data.clienteId}, NOW(), NOW())
+    RETURNING id
+  `;
+  // Retorna la solicitud recién creada con los datos del cliente
+  return findById(result[0].id);
+};
+
 // Buscar solicitud por ID
 export const findById = async (id: number) => {
   // Consulta SQL para buscar solicitud por ID
