@@ -78,7 +78,6 @@ export const findById = async (id: number) => {
 
 // Actualiza el estado de una solicitud
 export const updateStatus = async (id: number, data: { estado: string }) => {
-  // Actualiza el estado de una solicitud
   const rows = await prisma.$queryRaw<RequestRow[]>`
     UPDATE "Solicitudes" s
     SET estado = ${data.estado}::"EstadoSolicitud", "updatedAt" = NOW()
@@ -91,9 +90,79 @@ export const updateStatus = async (id: number, data: { estado: string }) => {
   return row ? mapRequestRow(row) : null;
 };
 
+// Actualiza los campos de una solicitud
+export const update = async (
+  id: number,
+  data: { numero?: string; fecha?: Date; tipo?: string; descripcion?: string; estado?: string; clienteId?: number }
+) => {
+  // Construye dinámicamente los SET
+  const setClauses: string[] = [];
+  const params: any[] = [];
+  let idx = 1;
+  // Si se envía el número, se actualiza
+  if (data.numero !== undefined) {
+    setClauses.push(`numero = $${idx}`);
+    params.push(data.numero);
+    idx++;
+  }
+  // Si se envía la fecha, se actualiza
+  if (data.fecha !== undefined) {
+    setClauses.push(`fecha = $${idx}`);
+    params.push(data.fecha);
+    idx++;
+  }
+  // Si se envía el tipo, se actualiza
+  if (data.tipo !== undefined) {
+    setClauses.push(`tipo = $${idx}`);
+    params.push(data.tipo);
+    idx++;
+  }
+  // Si se envía la descripción, se actualiza
+  if (data.descripcion !== undefined) {
+    setClauses.push(`descripcion = $${idx}`);
+    params.push(data.descripcion);
+    idx++;
+  }
+  // Si se envía el estado, se actualiza
+  if (data.estado !== undefined) {
+    setClauses.push(`estado = $${idx}::"EstadoSolicitud"`);
+    params.push(data.estado);
+    idx++;
+  }
+  // Si se envía el cliente, se actualiza
+  if (data.clienteId !== undefined) {
+    setClauses.push(`"clienteId" = $${idx}`);
+    params.push(data.clienteId);
+    idx++;
+  }
+
+  // Siempre actualiza el timestamp
+  setClauses.push(`"updatedAt" = NOW()`);
+
+  // Si no hay campos que actualizar, retorna la solicitud actual
+  if (setClauses.length === 1) {
+    return findById(id);
+  }
+
+  // Agrega el ID al final de los parámetros
+  params.push(id);
+
+  // Ejecuta la actualización con RETURNING incluyendo el join a Clientes
+  const sql = `
+    UPDATE "Solicitudes" s
+    SET ${setClauses.join(', ')}
+    FROM "Clientes" c
+    WHERE s.id = $${idx} AND c.id = s."clienteId"
+    RETURNING s.id, s.numero, s.fecha, s.tipo, s.descripcion, s.estado, s."clienteId",
+              c.id AS cliente_id, c.nombre AS cliente_nombre, c.email AS cliente_email, c.telefono AS cliente_telefono
+  `;
+  const rows = await prisma.$queryRawUnsafe<RequestRow[]>(sql, ...params);
+  const row = rows[0];
+  return row ? mapRequestRow(row) : null;
+};
+
 // Elimina una solicitud
 export const remove = async (id: number) => {
-  // Elimina una solicitud
   await prisma.$executeRaw`
     DELETE FROM "Solicitudes" WHERE id = ${id}
   `;

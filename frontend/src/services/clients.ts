@@ -1,8 +1,8 @@
 import axios from 'axios';
-import type { DashboardStats } from '../types/dashboard';
+import type { ClientItem } from '../types/clients';
 
 // Crear instancia de axios con la URL base
-const api = axios.create({ baseURL: '/dashboard' });
+const api = axios.create({ baseURL: '/clientes' });
 // Interceptor para agregar el token en cada solicitud
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem('token');
@@ -10,8 +10,8 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
-// Obtiene las estadísticas del dashboard
-export const getStats = async () => {
-  const { data } = await api.get<DashboardStats>('/');
+// Obtener la lista de clientes
+export const getClients = async () => {
+  const { data } = await api.get<ClientItem[]>('/');
   return data;
 };

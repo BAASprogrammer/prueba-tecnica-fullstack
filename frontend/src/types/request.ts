@@ -40,8 +40,9 @@ export interface PropsRequestsTable {
   page: number;
   totalPages: number;
   expanded: number | null;
-  onPageChange: (page: number) => void;
-  onToggleExpand: (id: number | null) => void;
-  onCloseRequest: (id: number) => void;
-  onDeleteRequest: (id: number) => void;
+  onPageChange: (page: number) => void; // cambiar página
+  onToggleExpand: (id: number | null) => void; // expandir/colapsar detalles de solicitud
+  onCloseRequest: (id: number) => void; // cerrar solicitud
+  onDeleteRequest: (id: number) => void; // eliminar solicitud
+  onEditRequest: (id: number) => void; // editar solicitud
 }

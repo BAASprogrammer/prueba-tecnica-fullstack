@@ -36,17 +36,37 @@ export const remove = async (req: Request, res: Response) => {
   }
 };
 
-// Actualizar el estado de una solicitud
-export const updateStatus = async (req: Request, res: Response) => {
+// Actualizar una solicitud
+export const update = async (req: Request, res: Response) => {
   try {
     // Convierte el ID a número
-    const id = Number(req.params.id as string);
-    const { estado } = req.body;
-    // Llama al servicio para actualizar el estado
-    const result = await solicitudesService.updateStatus(id, { estado });
-    // Retorna el estado 200: OK, lo que significa que la solicitud se actualizó correctamente.
+    const id = Number(req.params.id);
+    // Extrae los campos del cuerpo de la solicitud
+    const { numero, fecha, tipo, descripcion, estado, clienteId, nombre, email, telefono } = req.body;
+    // Llama al servicio para actualizar la solicitud
+    const result = await solicitudesService.update(id, { numero, fecha, tipo, descripcion, estado, clienteId, nombre, email, telefono });
+    // Retorna el resultado
     res.json(result);
   } catch (error) {
+    // Retorna estado 500: Internal Server Error
     res.status(500).json({ error: 'Error al actualizar solicitud' });
+  }
+};
+
+// Obtener una solicitud por ID
+export const getById = async (req: Request, res: Response) => {
+  try {
+    // Convierte el ID a número
+    const id = Number(req.params.id);
+    // Llama al servicio para obtener la solicitud
+    const result = await solicitudesService.getById(id);
+    // Si la solicitud no existe, retorna estado 404: Not Found
+    if (!result) {
+      res.status(404).json({ error: 'Solicitud no encontrada' });
+      return;
+    }
+    res.json(result);
+  } catch (error) {
+    res.status(500).json({ error: 'Error al obtener solicitud' });
   }
 };

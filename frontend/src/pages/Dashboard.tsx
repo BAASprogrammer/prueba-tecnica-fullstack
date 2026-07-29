@@ -2,6 +2,7 @@ import { useAuth } from '../hooks/useAuth';
 import { LogOut, User, CheckCircle2, AlertCircle, Search, ArrowUpDown } from 'lucide-react';
 import RequestsTable from '../components/RequestsTable';
 import StatsCards from '../components/StatsCards';
+import EditRequestModal from '../components/EditRequestModal';
 import { useDashboard } from '../hooks/useDashboard';
 import { useRequests } from '../hooks/useRequests';
 import { useFlashMessage } from '../hooks/useFlashMessage';
@@ -15,11 +16,12 @@ export default function Dashboard() {
   const { message, showMessage } = useFlashMessage();
   // Hook de gestión de solicitudes
   const {
-    requests, loading, page, totalPages, total, expanded, filters,
+    requests, loading, page, totalPages, total, expanded, filters, editRequestItem,
     setPage, setExpanded, updateFilters,
     confirmId, deleteConfirmId,
     handleCloseRequest, confirmClose, setConfirmId,
     handleDeleteRequest, confirmDelete, setDeleteConfirmId,
+    handleEditRequest, saveEditRequest, setEditRequestItem,
   } = useRequests(refreshStats, showMessage);
 
   return (
@@ -122,6 +124,15 @@ export default function Dashboard() {
           </div>
         )}
 
+        {/* Modal de edición de solicitud */}
+        {editRequestItem && (
+          <EditRequestModal
+            request={editRequestItem}
+            onSave={saveEditRequest}
+            onClose={() => setEditRequestItem(null)}
+          />
+        )}
+
         {/* Modal de confirmación de cierre */}
         {confirmId !== null && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
@@ -157,6 +168,7 @@ export default function Dashboard() {
           onToggleExpand={setExpanded}
           onCloseRequest={handleCloseRequest}
           onDeleteRequest={handleDeleteRequest}
+          onEditRequest={handleEditRequest}
         />
       </main>
     </div>

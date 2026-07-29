@@ -50,7 +50,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setToken(null);
     setUser(null);
   };
-  // Valor del contexto 
+
+  // Valor del contexto
   return (
     <AuthContext.Provider value={{ user, token, loading, login, register, logout }}>
       {children}

@@ -9,7 +9,8 @@ export default defineConfig({
     proxy: {
       '/auth': 'http://localhost:4000',
       '/solicitudes': 'http://localhost:4000',
-      '/dashboard': 'http://localhost:4000'
+      '/dashboard': 'http://localhost:4000',
+      '/clientes': 'http://localhost:4000'
     },
   },
 })

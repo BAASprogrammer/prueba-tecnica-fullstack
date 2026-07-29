@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { getStats } from '../services/dashboard';
 import type { DashboardStats } from '../types/dashboard';
 
+// Hook para obtener y refrescar las estadísticas del dashboard
 export function useDashboard() {
   // Estado de las estadísticas
   const [stats, setStats] = useState<DashboardStats | null>(null);
