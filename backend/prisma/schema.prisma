@@ -20,7 +20,7 @@ model Usuarios {
   email     String   @unique
   password  String
   nombre    String
-  rol       String   @default("usuario")
+  rol       String   @default("admin")
   activo    Boolean  @default(true)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

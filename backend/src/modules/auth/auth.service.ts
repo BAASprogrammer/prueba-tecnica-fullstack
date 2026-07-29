@@ -14,7 +14,7 @@ export const register = async (email: string, password: string, nombre: string) 
   const existing = await authRepository.findByEmail(email);
   // si el usuario existe lanzar error
   if (existing) {
-    throw { status: 409, message: 'El email ya esta registrado' };
+    throw { status: 409, message: 'El email ya está registrado' };
   }
   // generar hash de la contraseña
   const hashedPassword = await bcrypt.hash(password, 10);
@@ -32,13 +32,13 @@ export const login = async (email: string, password: string) => {
   const user = await authRepository.findByEmail(email);
   // si el usuario no existe lanzar error
   if (!user) {
-    throw { status: 401, message: 'Credenciales invalidas' };
+    throw { status: 401, message: 'Credenciales inválidas' };
   }
 
   const valid = await bcrypt.compare(password, user.password);
   // si la contraseña es incorrecta lanzar error
   if (!valid) {
-    throw { status: 401, message: 'Credenciales invalidas' };
+    throw { status: 401, message: 'Credenciales inválidas' };
   }
   // devolver solo el token y el usuario
   return {

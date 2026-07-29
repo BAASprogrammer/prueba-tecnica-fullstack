@@ -4,6 +4,7 @@ import bcrypt from 'bcryptjs';
 const prisma = new PrismaClient();
 
 async function main() {
+  // Hashear la contraseña del usuario administrador
   const hashedPassword = await bcrypt.hash('123456', 10);
   await prisma.usuarios.upsert({
     where: { email: 'admin@correo.cl' },
@@ -11,6 +12,7 @@ async function main() {
     create: { email: 'admin@correo.cl', password: hashedPassword, nombre: 'Admin', rol: 'admin', activo: true },
   });
 
+  // Crear clientes iniciales
   const rodrigo = await prisma.clientes.upsert({
     where: { email: 'rodrigo.alarcon@correo.cl' },
     update: {},
@@ -42,6 +44,7 @@ async function main() {
     create: { nombre: 'Antonia Sepúlveda', email: 'antonia.sepulveda@hotmail.com', telefono: '+56966677788' },
   });
 
+  // Crear solicitudes iniciales
   const solicitudes = [
     { numero: 'REQ-2026-001', tipo: 'Reclamo por servicio', descripcion: 'El técnico no llegó en el horario acordado y no hubo aviso previo', estado: 'PENDIENTE' as const, clienteId: rodrigo.id },
     { numero: 'REQ-2026-002', tipo: 'Consulta de contrato', descripcion: 'Necesita copia del contrato firmado el año pasado', estado: 'FINALIZADA' as const, clienteId: fernanda.id },
@@ -56,7 +59,7 @@ async function main() {
     { numero: 'REQ-2026-011', tipo: 'Consulta de contrato', descripcion: 'Solicita información sobre penalidad por término anticipado', estado: 'RECHAZADA' as const, clienteId: sebastian.id },
     { numero: 'REQ-2026-012', tipo: 'Solicitud de upgrade', descripcion: 'Quiere sumar servicio de streaming al plan actual', estado: 'FINALIZADA' as const, clienteId: antonia.id },
   ];
-
+  // Crear solicitudes iniciales en la base de datos
   for (const s of solicitudes) {
     await prisma.solicitudes.upsert({
       where: { numero: s.numero },
@@ -67,7 +70,7 @@ async function main() {
 
   console.log('Seed completado: 1 usuario, 6 clientes, 12 solicitudes.');
 }
-
+// Ejecutar seed
 main()
   .catch((e) => {
     console.error(e);

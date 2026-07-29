@@ -4,5 +4,5 @@ import { prisma } from '../../shared/prisma';
 export const findAll = () =>
   prisma.solicitudes.findMany({
     orderBy: { fecha: 'desc' },
-    include: { cliente: { select: { id: true, nombre: true, email: true } } },
+    include: { cliente: { select: { id: true, nombre: true, email: true, telefono: true } } },
   });
