@@ -18,10 +18,10 @@ export default function Dashboard() {
             </div>
             <button
               onClick={logout}
-              className="flex items-center gap-1 text-sm text-red-600 hover:text-red-800"
+              className="flex items-center gap-1 text-sm text-red-600 hover:text-red-800 cursor-pointer"
             >
               <LogOut className="w-4 h-4" />
-              Cerrar Sesion
+              Cerrar Sesión
             </button>
           </div>
         </div>

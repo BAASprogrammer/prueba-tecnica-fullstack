@@ -1,28 +1,47 @@
 import { PrismaClient } from '@prisma/client';
+import bcrypt from 'bcryptjs';
 
 const prisma = new PrismaClient();
-// Datos ficticios iniciales de clientes y solicitudes
+
 async function main() {
-  // Clientes de ejemplo
-  const rodrigo = await prisma.cliente.create({
-    data: { nombre: 'Rodrigo Alarcón', email: 'rodrigo.alarcon@correo.cl', telefono: '+56911122233' },
+  const hashedPassword = await bcrypt.hash('123456', 10);
+  await prisma.usuarios.upsert({
+    where: { email: 'admin@correo.cl' },
+    update: { password: hashedPassword, rol: 'admin', activo: true },
+    create: { email: 'admin@correo.cl', password: hashedPassword, nombre: 'Admin', rol: 'admin', activo: true },
   });
-  const fernanda = await prisma.cliente.create({
-    data: { nombre: 'Fernanda Espinoza', email: 'fernanda.espinoza@mail.com', telefono: '+56922233344' },
+
+  const rodrigo = await prisma.clientes.upsert({
+    where: { email: 'rodrigo.alarcon@correo.cl' },
+    update: {},
+    create: { nombre: 'Rodrigo Alarcón', email: 'rodrigo.alarcon@correo.cl', telefono: '+56911122233' },
   });
-  const ignacio = await prisma.cliente.create({
-    data: { nombre: 'Ignacio Bravo', email: 'ignacio.bravo@empresa.cl', telefono: '+56933344455' },
+  const fernanda = await prisma.clientes.upsert({
+    where: { email: 'fernanda.espinoza@mail.com' },
+    update: {},
+    create: { nombre: 'Fernanda Espinoza', email: 'fernanda.espinoza@mail.com', telefono: '+56922233344' },
   });
-  const josefa = await prisma.cliente.create({
-    data: { nombre: 'Josefa Reyes', email: 'josefa.reyes@gmail.com', telefono: '+56944455566' },
+  const ignacio = await prisma.clientes.upsert({
+    where: { email: 'ignacio.bravo@empresa.cl' },
+    update: {},
+    create: { nombre: 'Ignacio Bravo', email: 'ignacio.bravo@empresa.cl', telefono: '+56933344455' },
   });
-  const sebastian = await prisma.cliente.create({
-    data: { nombre: 'Sebastián Contreras', email: 'sebastian.contreras@outlook.com', telefono: '+56955566677' },
+  const josefa = await prisma.clientes.upsert({
+    where: { email: 'josefa.reyes@gmail.com' },
+    update: {},
+    create: { nombre: 'Josefa Reyes', email: 'josefa.reyes@gmail.com', telefono: '+56944455566' },
   });
-  const antonia = await prisma.cliente.create({
-    data: { nombre: 'Antonia Sepúlveda', email: 'antonia.sepulveda@hotmail.com', telefono: '+56966677788' },
+  const sebastian = await prisma.clientes.upsert({
+    where: { email: 'sebastian.contreras@outlook.com' },
+    update: {},
+    create: { nombre: 'Sebastián Contreras', email: 'sebastian.contreras@outlook.com', telefono: '+56955566677' },
   });
-  // Solicitudes de ejemplo
+  const antonia = await prisma.clientes.upsert({
+    where: { email: 'antonia.sepulveda@hotmail.com' },
+    update: {},
+    create: { nombre: 'Antonia Sepúlveda', email: 'antonia.sepulveda@hotmail.com', telefono: '+56966677788' },
+  });
+
   const solicitudes = [
     { numero: 'REQ-2026-001', tipo: 'Reclamo por servicio', descripcion: 'El técnico no llegó en el horario acordado y no hubo aviso previo', estado: 'PENDIENTE' as const, clienteId: rodrigo.id },
     { numero: 'REQ-2026-002', tipo: 'Consulta de contrato', descripcion: 'Necesita copia del contrato firmado el año pasado', estado: 'FINALIZADA' as const, clienteId: fernanda.id },
@@ -37,12 +56,16 @@ async function main() {
     { numero: 'REQ-2026-011', tipo: 'Consulta de contrato', descripcion: 'Solicita información sobre penalidad por término anticipado', estado: 'RECHAZADA' as const, clienteId: sebastian.id },
     { numero: 'REQ-2026-012', tipo: 'Solicitud de upgrade', descripcion: 'Quiere sumar servicio de streaming al plan actual', estado: 'FINALIZADA' as const, clienteId: antonia.id },
   ];
-  // Se insertan las solicitudes en la base de datos
-  for (const solicitud of solicitudes) {
-    await prisma.solicitud.create({ data: solicitud });
+
+  for (const s of solicitudes) {
+    await prisma.solicitudes.upsert({
+      where: { numero: s.numero },
+      update: {},
+      create: s,
+    });
   }
 
-  console.log(`Se insertaron 6 clientes y ${solicitudes.length} solicitudes.`);
+  console.log('Seed completado: 1 usuario, 6 clientes, 12 solicitudes.');
 }
 
 main()

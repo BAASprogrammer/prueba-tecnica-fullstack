@@ -15,32 +15,33 @@ enum EstadoSolicitud {
   RECHAZADA
 }
 // Tabla de usuarios para autenticacion
-model User {
+model Usuarios {
   id        Int      @id @default(autoincrement())
   email     String   @unique
   password  String
   nombre    String
   rol       String   @default("usuario")
+  activo    Boolean  @default(true)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   @@index([email])
 }
 // Tabla de clientes
-model Cliente {
-  id          Int         @id @default(autoincrement())
+model Clientes {
+  id          Int           @id @default(autoincrement())
   nombre      String
-  email       String      @unique
+  email       String        @unique
   telefono    String
-  createdAt   DateTime    @default(now())
-  updatedAt   DateTime    @updatedAt
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
 
-  solicitudes Solicitud[]
+  solicitudes Solicitudes[]
 
   @@index([email])
 }
 // Tabla de solicitudes
-model Solicitud {
+model Solicitudes {
   id          Int             @id @default(autoincrement())
   numero      String          @unique
   fecha       DateTime        @default(now())
@@ -51,7 +52,7 @@ model Solicitud {
   updatedAt   DateTime        @updatedAt
 
   clienteId   Int
-  cliente     Cliente         @relation(fields: [clienteId], references: [id])
+  cliente     Clientes        @relation(fields: [clienteId], references: [id])
 
   @@index([estado])
   @@index([fecha])

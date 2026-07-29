@@ -1,5 +1,5 @@
 --
--- PostgreSQL database dump (Updated for new schema)
+-- PostgreSQL database dump
 --
 
 SET statement_timeout = 0;
@@ -14,10 +14,17 @@ SET client_min_messages = warning;
 SET row_security = off;
 
 --
--- Data for Name: Cliente; Type: TABLE DATA; Schema: public; Owner: postgres
+-- Data for Name: Usuarios; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-INSERT INTO public."Cliente" (id, nombre, email, telefono, "createdAt", "updatedAt") VALUES
+INSERT INTO public."Usuarios" (id, email, password, nombre, rol, activo, "createdAt", "updatedAt") VALUES
+(1, 'admin@correo.cl', '$2b$10$.rP/v9GrSIwVCLaRSCCtIO1Vchs0OZ2GYlsrOnqrmv/ZkpzrIhIGK', 'Admin', 'admin', true, NOW(), NOW());
+
+--
+-- Data for Name: Clientes; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+INSERT INTO public."Clientes" (id, nombre, email, telefono, "createdAt", "updatedAt") VALUES
 (1, 'Rodrigo Alarcón', 'rodrigo.alarcon@correo.cl', '+56911122233', NOW(), NOW()),
 (2, 'Fernanda Espinoza', 'fernanda.espinoza@mail.com', '+56922233344', NOW(), NOW()),
 (3, 'Ignacio Bravo', 'ignacio.bravo@empresa.cl', '+56933344455', NOW(), NOW()),
@@ -26,10 +33,10 @@ INSERT INTO public."Cliente" (id, nombre, email, telefono, "createdAt", "updated
 (6, 'Antonia Sepúlveda', 'antonia.sepulveda@hotmail.com', '+56966677788', NOW(), NOW());
 
 --
--- Data for Name: Solicitud; Type: TABLE DATA; Schema: public; Owner: postgres
+-- Data for Name: Solicitudes; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-INSERT INTO public."Solicitud" (id, numero, fecha, tipo, descripcion, estado, "clienteId", "createdAt", "updatedAt") VALUES
+INSERT INTO public."Solicitudes" (id, numero, fecha, tipo, descripcion, estado, "clienteId", "createdAt", "updatedAt") VALUES
 (1, 'REQ-2026-001', NOW(), 'Reclamo por servicio', 'El técnico no llegó en el horario acordado y no hubo aviso previo', 'PENDIENTE', 1, NOW(), NOW()),
 (2, 'REQ-2026-002', NOW(), 'Consulta de contrato', 'Necesita copia del contrato firmado el año pasado', 'FINALIZADA', 2, NOW(), NOW()),
 (3, 'REQ-2026-003', NOW(), 'Solicitud de upgrade', 'Quiere aumentar la velocidad de su plan actual', 'EN_PROCESO', 3, NOW(), NOW()),
@@ -47,5 +54,6 @@ INSERT INTO public."Solicitud" (id, numero, fecha, tipo, descripcion, estado, "c
 -- Set sequence values
 --
 
-SELECT pg_catalog.setval('public."Cliente_id_seq"', 6, true);
-SELECT pg_catalog.setval('public."Solicitud_id_seq"', 12, true);
+SELECT pg_catalog.setval('public."Usuarios_id_seq"', 1, true);
+SELECT pg_catalog.setval('public."Clientes_id_seq"', 6, true);
+SELECT pg_catalog.setval('public."Solicitudes_id_seq"', 12, true);

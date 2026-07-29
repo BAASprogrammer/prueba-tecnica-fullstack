@@ -35,7 +35,7 @@ export default function Login() {
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
       <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
         <h1 className="text-2xl font-bold text-center mb-6 text-gray-800">
-          {isRegister ? 'Crear Cuenta' : 'Iniciar Sesion'}
+          {isRegister ? 'Crear Cuenta' : 'Iniciar Sesión'}
         </h1>
 
         {error && (
@@ -70,7 +70,7 @@ export default function Login() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Contrasena</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Contraseña</label>
             <input
               type="password"
               value={password}
@@ -83,7 +83,7 @@ export default function Login() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full flex items-center justify-center gap-2 bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 disabled:opacity-50 transition-colors"
+            className="w-full flex items-center justify-center gap-2 bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 disabled:opacity-50 transition-colors cursor-pointer"
           >
             {/* Spinner de carga si el formulario esta cargando */}
             {loading ? (
@@ -93,15 +93,15 @@ export default function Login() {
             ) : (
               <LogIn className="w-4 h-4" />
             )}
-            {isRegister ? 'Registrarse' : 'Iniciar Sesion'}
+            {isRegister ? 'Registrarse' : 'Iniciar Sesión'}
           </button>
         </form>
 
         <button
           onClick={() => { setIsRegister(!isRegister); setError(''); }}
-          className="w-full text-center text-sm text-blue-600 hover:text-blue-800 mt-4"
+          className="w-full text-center text-sm text-blue-600 hover:text-blue-800 mt-4 cursor-pointer"
         >
-          {isRegister ? 'Ya tienes cuenta? Inicia sesion' : 'No tienes cuenta? Registrate'}
+          {isRegister ? '¿Ya tienes cuenta? Inicia sesión' : '¿No tienes cuenta? Regístrate'}
         </button>
       </div>
     </div>
