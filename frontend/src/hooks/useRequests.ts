@@ -1,10 +1,27 @@
 import { useState, useEffect, useCallback } from 'react';
 import { getRequests, deleteRequest, editRequest } from '../services/requests';
 import type { RequestItem, RequestFilters } from '../types/request';
-import type { EditRequestData } from '../types/edit-request-modal';
+import type { EditRequestData, FieldErrors } from '../types/edit-request-modal';
 
 // Tamaño de la página
 const PAGE_SIZE = 4;
+
+// Validación del formulario de edición
+export const validateEditForm = (values: {
+  clientName: string; clientEmail: string; clientPhone: string;
+  date: string; type: string; description: string;
+}): FieldErrors => {
+  const errors: FieldErrors = {};
+  if (!values.clientName.trim()) errors.clientName = 'El nombre del cliente es obligatorio';
+  if (!values.clientEmail.trim()) errors.clientEmail = 'El email es obligatorio';
+  else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(values.clientEmail)) errors.clientEmail = 'Email inválido';
+  if (!values.clientPhone.trim()) errors.clientPhone = 'El teléfono es obligatorio';
+  else if (!/^\+569\d{8}$/.test(values.clientPhone)) errors.clientPhone = 'Formato: +56912345678';
+  if (!values.date) errors.date = 'La fecha es obligatoria';
+  if (!values.type.trim()) errors.type = 'El tipo de solicitud es obligatorio';
+  if (!values.description.trim()) errors.description = 'La descripción es obligatoria';
+  return errors;
+};
 
 // Hook para obtener y manejar las solicitudes
 export function useRequests(refreshStats: () => void, showMessage: (type: 'success' | 'error', text: string) => void) {

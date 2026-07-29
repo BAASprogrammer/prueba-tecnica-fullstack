@@ -17,3 +17,13 @@ export interface EditRequestModalProps {
   onSave: (id: number, data: EditRequestData) => Promise<void>;
   onClose: () => void;
 }
+
+// Errores de validación del formulario
+export interface FieldErrors {
+  clientName?: string;
+  clientEmail?: string;
+  clientPhone?: string;
+  date?: string;
+  type?: string;
+  description?: string;
+}

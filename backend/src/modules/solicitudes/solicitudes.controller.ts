@@ -36,15 +36,55 @@ export const remove = async (req: Request, res: Response) => {
   }
 };
 
-// Actualizar una solicitud
+// Actualizar una solicitud (campos opcionales)
 export const update = async (req: Request, res: Response) => {
   try {
     // Convierte el ID a número
     const id = Number(req.params.id);
     // Extrae los campos del cuerpo de la solicitud
-    const { numero, fecha, tipo, descripcion, estado, clienteId, nombre, email, telefono } = req.body;
+    const { fecha, tipo, descripcion, estado, nombre, email, telefono } = req.body;
+
+    // Validar fecha
+    if (fecha !== undefined && isNaN(new Date(fecha).getTime())) {
+      res.status(400).json({ error: 'Fecha inválida' });
+      return;
+    }
+    // Validar tipo
+    if (tipo !== undefined && !tipo.toString().trim()) {
+      res.status(400).json({ error: 'El tipo de solicitud no puede estar vacío' });
+      return;
+    }
+    // Validar descripción
+    if (descripcion !== undefined && !descripcion.toString().trim()) {
+      res.status(400).json({ error: 'La descripción no puede estar vacía' });
+      return;
+    }
+    // Validar estado
+    if (estado !== undefined) {
+      const validStates = ['PENDIENTE', 'EN_PROCESO', 'FINALIZADA', 'RECHAZADA'];
+      if (!validStates.includes(estado)) {
+        res.status(400).json({ error: 'Estado inválido' });
+        return;
+      }
+    }
+    // Validar nombre del cliente
+    if (nombre !== undefined && !nombre.toString().trim()) {
+      res.status(400).json({ error: 'El nombre del cliente no puede estar vacío' });
+      return;
+    }
+    // Validar email
+    if (email !== undefined && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      res.status(400).json({ error: 'Email inválido' });
+      return;
+    }
+    // Validar teléfono
+    if (telefono !== undefined && !/^\+569\d{8}$/.test(telefono.toString())) {
+      res.status(400).json({ error: 'El teléfono debe tener formato +56912345678' });
+      return;
+    }
+
     // Llama al servicio para actualizar la solicitud
-    const result = await solicitudesService.update(id, { numero, fecha, tipo, descripcion, estado, clienteId, nombre, email, telefono });
+    const result = await solicitudesService.update(id, { fecha, tipo, descripcion, estado, nombre, email, telefono });
     // Retorna el resultado
     res.json(result);
   } catch (error) {
