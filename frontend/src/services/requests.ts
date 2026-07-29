@@ -2,7 +2,7 @@ import axios from 'axios';
 import type { RawRequest, RawPaginatedResponse, RequestItem, PaginatedResponse } from '../types/request';
 
 // Crea la instancia de axios con la URL base
-const api = axios.create({ baseURL: '/api/solicitudes' });
+const api = axios.create({ baseURL: '/solicitudes' });
 
 // Interceptor para incluir el token en las solicitudes
 api.interceptors.request.use((config) => {
@@ -36,4 +36,10 @@ export const getRequests = async (page: number, pageSize: number) => {
     pageSize: data.pageSize,
     totalPages: data.totalPages,
   } satisfies PaginatedResponse;
+};
+
+// Actualiza una solicitud existente
+export const updateRequest = async (id: number, data: Partial<{ estado: string }>) => {
+  const response = await api.put<RawRequest>(`/${id}`, data);
+  return mapRequest(response.data);
 };

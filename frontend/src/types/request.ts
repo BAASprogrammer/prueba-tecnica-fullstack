@@ -49,3 +49,16 @@ export interface PaginatedResponse {
   pageSize: number;
   totalPages: number;
 }
+
+// Props del componente RequestsTable
+export interface PropsRequestsTable {
+  requests: RequestItem[];
+  loading: boolean;
+  total: number;
+  page: number;
+  totalPages: number;
+  expanded: number | null;
+  onPageChange: (page: number) => void;
+  onToggleExpand: (id: number | null) => void;
+  onCloseRequest: (id: number) => void;
+}

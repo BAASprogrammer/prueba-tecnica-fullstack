@@ -1,7 +1,7 @@
 import axios from 'axios';
 import type { AuthResponse, User } from '../types/auth';
 // Crear instancia de axios
-const api = axios.create({ baseURL: '/api/auth' });
+const api = axios.create({ baseURL: '/auth' });
 
 // Interceptor para agregar el token en cada solicitud
 api.interceptors.request.use((config) => {
