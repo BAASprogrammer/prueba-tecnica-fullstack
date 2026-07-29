@@ -18,20 +18,20 @@ export interface RequestItem {
 
 export interface RawClient {
   id: number;
-  nombre: string;
+  name: string;
   email: string;
-  telefono: string;
+  phone: string;
 }
 
 export interface RawRequest {
   id: number;
-  numero: string;
-  fecha: string;
-  tipo: string;
-  descripcion: string;
-  estado: string;
-  clienteId: number;
-  cliente: RawClient;
+  number: string;
+  date: string;
+  type: string;
+  description: string;
+  status: string;
+  clientId: number;
+  client: RawClient;
 }
 
 export interface RawPaginatedResponse {
@@ -61,4 +61,5 @@ export interface PropsRequestsTable {
   onPageChange: (page: number) => void;
   onToggleExpand: (id: number | null) => void;
   onCloseRequest: (id: number) => void;
+  onDeleteRequest: (id: number) => void;
 }

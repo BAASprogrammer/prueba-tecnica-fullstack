@@ -1,21 +1,63 @@
-import { EstadoSolicitud } from '@prisma/client';
 import { prisma } from '../../shared/prisma';
+import type { RequestRow } from '../../types/request';
+import { mapRequestRow } from '../../types/request';
 
-// Incluir el cliente en la consulta y ordenar por fecha
-const include = { cliente: { select: { id: true, nombre: true, email: true, telefono: true } } };
-const orderBy = { fecha: 'desc' as const };
+// Obtiene todas las solicitudes de forma paginada
+export const findAllPaginated = async (page: number, pageSize: number) => {
+  // Obtiene todas las solicitudes de forma paginada
+  const [data, countResult] = await Promise.all([
+    // Consulta SQL para obtener todas las solicitudes de forma paginada
+    prisma.$queryRaw<RequestRow[]>`
+      SELECT s.id, s.numero, s.fecha, s.tipo, s.descripcion, s.estado, s."clienteId",
+             c.id AS cliente_id, c.nombre AS cliente_nombre, c.email AS cliente_email, c.telefono AS cliente_telefono
+      FROM "Solicitudes" s
+      JOIN "Clientes" c ON c.id = s."clienteId"
+      ORDER BY s.fecha DESC
+      OFFSET ${(page - 1) * pageSize}
+      LIMIT ${pageSize}
+    `,
+    // Consulta SQL para obtener el número total de solicitudes
+    prisma.$queryRaw<[{ total: bigint }]>`
+      SELECT COUNT(*) AS total FROM "Solicitudes"
+    `,
+  ]);
+  // Retorna todas las solicitudes de forma paginada
+  return { data: data.map(mapRequestRow), total: Number(countResult[0].total) };
+};
 
-// Encontrar todas las solicitudes de forma paginada
-export const findAllPaginated = (page: number, pageSize: number) =>
-  Promise.all([
-    prisma.solicitudes.findMany({ orderBy, include, skip: (page - 1) * pageSize, take: pageSize }),
-    prisma.solicitudes.count(),
-  ]).then(([data, total]) => ({ data, total }));
+// Buscar solicitud por ID
+export const findById = async (id: number) => {
+  // Consulta SQL para buscar solicitud por ID
+  const rows = await prisma.$queryRaw<RequestRow[]>`
+    SELECT s.id, s.numero, s.fecha, s.tipo, s.descripcion, s.estado, s."clienteId",
+           c.id AS cliente_id, c.nombre AS cliente_nombre, c.email AS cliente_email, c.telefono AS cliente_telefono
+    FROM "Solicitudes" s
+    JOIN "Clientes" c ON c.id = s."clienteId"
+    WHERE s.id = ${id}
+  `;
+  const row = rows[0];
+  return row ? mapRequestRow(row) : null;
+};
 
-// Encontrar una solicitud por ID
-export const findById = (id: number) =>
-  prisma.solicitudes.findUnique({ where: { id }, include: { cliente: true } });
+// Actualiza el estado de una solicitud
+export const updateStatus = async (id: number, data: { estado: string }) => {
+  // Actualiza el estado de una solicitud
+  const rows = await prisma.$queryRaw<RequestRow[]>`
+    UPDATE "Solicitudes" s
+    SET estado = ${data.estado}::"EstadoSolicitud", "updatedAt" = NOW()
+    FROM "Clientes" c
+    WHERE s.id = ${id} AND c.id = s."clienteId"
+    RETURNING s.id, s.numero, s.fecha, s.tipo, s.descripcion, s.estado, s."clienteId",
+              c.id AS cliente_id, c.nombre AS cliente_nombre, c.email AS cliente_email, c.telefono AS cliente_telefono
+  `;
+  const row = rows[0];
+  return row ? mapRequestRow(row) : null;
+};
 
-// Actualizar el estado de una solicitud
-export const updateStatus = (id: number, data: { estado: EstadoSolicitud }) =>
-  prisma.solicitudes.update({ where: { id }, data, include: { cliente: true } });
+// Elimina una solicitud
+export const remove = async (id: number) => {
+  // Elimina una solicitud
+  await prisma.$executeRaw`
+    DELETE FROM "Solicitudes" WHERE id = ${id}
+  `;
+};

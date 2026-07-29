@@ -5,8 +5,9 @@ const JWT_SECRET: string = process.env.JWT_SECRET || 'secret_dev_key';
 
 // Autenticar usuario
 export const authenticate = (req: Request, res: Response, next: NextFunction) => {
+  // Obtener header de autorización
   const header = req.headers.authorization;
-  // si no existe el header lanzar error
+  // Si no existe el header lanzar error
   if (!header || !header.startsWith('Bearer ')) {
     res.status(401).json({ error: 'Token requerido' });
     return;

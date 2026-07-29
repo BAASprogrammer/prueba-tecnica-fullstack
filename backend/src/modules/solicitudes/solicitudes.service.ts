@@ -4,8 +4,20 @@ import { NotFoundError, ValidationError } from '../../shared/errors';
 
 // Obtener todas las solicitudes de forma paginada
 export const getAllPaginated = async (page: number, pageSize: number) => {
+  // Obtiene todas las solicitudes de forma paginada
   const { data, total } = await solicitudesRepository.findAllPaginated(page, pageSize);
+  // Retorna todas las solicitudes de forma paginada
   return { data, total, page, pageSize, totalPages: Math.ceil(total / pageSize) };
+};
+
+// Eliminar una solicitud
+export const remove = async (id: number) => {
+  // Buscar solicitud
+  const solicitud = await solicitudesRepository.findById(id);
+  // Si no se encuentra la solicitud, lanzar error
+  if (!solicitud) throw new NotFoundError('Solicitud no encontrada');
+  // Eliminar solicitud
+  await solicitudesRepository.remove(id);
 };
 
 // Actualizar estado de una solicitud
@@ -17,6 +29,7 @@ export const updateStatus = async (id: number, data: { estado: string }) => {
   }
   // Buscar solicitud
   const solicitud = await solicitudesRepository.findById(id);
+  // Si no se encuentra la solicitud, lanzar error
   if (!solicitud) {
     throw new NotFoundError('Solicitud no encontrada');
   }

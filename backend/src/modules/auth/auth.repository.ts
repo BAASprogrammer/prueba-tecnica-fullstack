@@ -1,16 +1,31 @@
 import { prisma } from '../../shared/prisma';
+import type { UserRow, UserPublic } from '../../types/user';
 
 // Buscar usuario por correo
-export const findByEmail = (email: string) =>
-  prisma.usuarios.findUnique({ where: { email } });
+export const findByEmail = async (email: string) => {
+  // Consulta SQL para buscar usuario por correo
+  const rows = await prisma.$queryRaw<UserRow[]>`
+    SELECT id, email, password, nombre AS name, rol AS role, activo AS active, "createdAt", "updatedAt"
+    FROM "Usuarios" WHERE email = ${email}
+  `;
+  return rows[0] ?? null;
+};
 
 // Buscar usuario por ID
-export const findById = (id: number) =>
-  prisma.usuarios.findUnique({
-    where: { id },
-    select: { id: true, email: true, nombre: true, rol: true },
-  });
+export const findById = async (id: number) => {
+  // Consulta SQL para buscar usuario por ID
+  const rows = await prisma.$queryRaw<UserPublic[]>`
+    SELECT id, email, nombre AS name, rol AS role FROM "Usuarios" WHERE id = ${id}
+  `;
+  return rows[0] ?? null;
+};
 
 // Crear usuario
-export const create = (data: { email: string; password: string; nombre: string }) =>
-  prisma.usuarios.create({ data });
+export const create = async (data: { email: string; password: string; nombre: string }) => {
+  // Consulta SQL para crear usuario
+  const rows = await prisma.$queryRaw<UserRow[]>`
+    INSERT INTO "Usuarios" (email, password, nombre) VALUES (${data.email}, ${data.password}, ${data.nombre})
+    RETURNING id, email, password, nombre AS name, rol AS role, activo AS active, "createdAt", "updatedAt"
+  `;
+  return rows[0]!;
+};

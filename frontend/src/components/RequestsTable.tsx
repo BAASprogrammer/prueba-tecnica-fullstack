@@ -4,7 +4,7 @@ import type { PropsRequestsTable } from '../types/request';
 
 export default function RequestsTable({
   requests, loading, total, page, totalPages,
-  expanded, onPageChange, onToggleExpand, onCloseRequest,
+  expanded, onPageChange, onToggleExpand, onCloseRequest, onDeleteRequest,
 }: PropsRequestsTable) {
   return (
     <div className="bg-white rounded-xl shadow-sm border overflow-hidden">
@@ -97,7 +97,7 @@ export default function RequestsTable({
                         >
                           <XCircle className="w-4 h-4" />
                         </button>
-                        <button className="text-gray-400 hover:text-red-600 transition-colors cursor-pointer" title="Eliminar solicitud" aria-label="Eliminar solicitud">
+                        <button onClick={() => onDeleteRequest(r.id)} className="text-gray-400 hover:text-red-600 transition-colors cursor-pointer" title="Eliminar solicitud" aria-label="Eliminar solicitud">
                           <Trash2 className="w-4 h-4" />
                         </button>
                       </div>

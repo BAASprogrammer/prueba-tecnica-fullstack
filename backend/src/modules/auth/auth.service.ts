@@ -6,8 +6,8 @@ import * as authRepository from './auth.repository';
 const JWT_SECRET: string = process.env.JWT_SECRET as string;
 
 // Generar token
-const signToken = (user: { id: number; email: string; rol: string }) =>
-  jwt.sign({ id: user.id, email: user.email, rol: user.rol }, JWT_SECRET, { expiresIn: '8h' });
+const signToken = (user: { id: number; email: string; role: string }) =>
+  jwt.sign({ id: user.id, email: user.email, rol: user.role }, JWT_SECRET, { expiresIn: '8h' });
 
 // Registrar usuario
 export const register = async (email: string, password: string, nombre: string) => {
@@ -22,7 +22,7 @@ export const register = async (email: string, password: string, nombre: string) 
   // devolver solo el token y el usuario
   return {
     token: signToken(user),
-    user: { id: user.id, email: user.email, nombre: user.nombre, rol: user.rol },
+    user: { id: user.id, email: user.email, nombre: user.name, rol: user.role },
   };
 };
 
@@ -43,7 +43,7 @@ export const login = async (email: string, password: string) => {
   // devolver solo el token y el usuario
   return {
     token: signToken(user),
-    user: { id: user.id, email: user.email, nombre: user.nombre, rol: user.rol },
+    user: { id: user.id, email: user.email, nombre: user.name, rol: user.role },
   };
 };
 
