@@ -1,5 +1,5 @@
 import axios from 'axios';
-import type { RawPaginatedResponse, PaginatedResponse, RequestItem } from '../types/request';
+import type { PaginatedResponse, RequestItem, RequestFilters } from '../types/request';
 
 // Crea la instancia de axios con la URL base
 const api = axios.create({ baseURL: '/solicitudes' });
@@ -11,16 +11,12 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
-// Obtiene las solicitudes paginadas desde el backend
-export const getRequests = async (page: number, pageSize: number) => {
-  const { data } = await api.get<RawPaginatedResponse>('/', { params: { page, pageSize } });
-  return {
-    data: data.data as RequestItem[],
-    total: data.total,
-    page: data.page,
-    pageSize: data.pageSize,
-    totalPages: data.totalPages,
-  } satisfies PaginatedResponse;
+// Obtiene las solicitudes paginadas desde el backend con filtros opcionales
+export const getRequests = async (page: number, pageSize: number, filters?: RequestFilters) => {
+  const { data } = await api.get<PaginatedResponse>('/', {
+    params: { page, pageSize, ...filters },
+  });
+  return data;
 };
 
 // Actualiza una solicitud existente

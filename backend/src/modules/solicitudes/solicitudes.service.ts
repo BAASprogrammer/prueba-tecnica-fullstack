@@ -2,10 +2,14 @@ import { EstadoSolicitud } from '@prisma/client';
 import * as solicitudesRepository from './solicitudes.repository';
 import { NotFoundError, ValidationError } from '../../shared/errors';
 
-// Obtener todas las solicitudes de forma paginada
-export const getAllPaginated = async (page: number, pageSize: number) => {
-  // Obtiene todas las solicitudes de forma paginada
-  const { data, total } = await solicitudesRepository.findAllPaginated(page, pageSize);
+// Obtener todas las solicitudes de forma paginada con filtros y ordenamiento
+export const getAllPaginated = async (
+  page: number,
+  pageSize: number,
+  filters: { search?: string; status?: string; orderBy?: string }
+) => {
+  // Obtiene las solicitudes con los filtros aplicados
+  const { data, total } = await solicitudesRepository.findAllPaginated(page, pageSize, filters);
   // Retorna todas las solicitudes de forma paginada
   return { data, total, page, pageSize, totalPages: Math.ceil(total / pageSize) };
 };

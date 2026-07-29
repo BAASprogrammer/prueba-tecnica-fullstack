@@ -1,5 +1,5 @@
 import { useAuth } from '../hooks/useAuth';
-import { LogOut, User, CheckCircle2, AlertCircle } from 'lucide-react';
+import { LogOut, User, CheckCircle2, AlertCircle, Search, ArrowUpDown } from 'lucide-react';
 import RequestsTable from '../components/RequestsTable';
 import StatsCards from '../components/StatsCards';
 import { useDashboard } from '../hooks/useDashboard';
@@ -15,8 +15,8 @@ export default function Dashboard() {
   const { message, showMessage } = useFlashMessage();
   // Hook de gestión de solicitudes
   const {
-    requests, loading, page, totalPages, total, expanded,
-    setPage, setExpanded,
+    requests, loading, page, totalPages, total, expanded, filters,
+    setPage, setExpanded, updateFilters,
     confirmId, deleteConfirmId,
     handleCloseRequest, confirmClose, setConfirmId,
     handleDeleteRequest, confirmDelete, setDeleteConfirmId,
@@ -59,6 +59,44 @@ export default function Dashboard() {
 
         {/* Tarjetas de estadísticas */}
         {stats && <StatsCards stats={stats} />}
+
+        {/* Barra de búsqueda, filtro por estado y ordenamiento */}
+        <div className="bg-white rounded-xl shadow-sm border p-4 mb-6">
+          <div className="flex flex-col sm:flex-row gap-3">
+            {/* Campo de búsqueda */}
+            <div className="flex-1 relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+              <input
+                type="text"
+                placeholder="Buscar por número, cliente o descripción..."
+                value={filters.search}
+                onChange={(e) => updateFilters({ search: e.target.value })}
+                className="w-full pl-9 pr-4 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none"
+              />
+            </div>
+            {/* Filtro por estado */}
+            <select
+              value={filters.status}
+              onChange={(e) => updateFilters({ status: e.target.value })}
+              className="px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none bg-white"
+            >
+              <option value="">Todos los estados</option>
+              <option value="PENDIENTE">Pendiente</option>
+              <option value="EN_PROCESO">En proceso</option>
+              <option value="FINALIZADA">Finalizada</option>
+              <option value="RECHAZADA">Rechazada</option>
+            </select>
+            {/* Botón de ordenamiento por fecha */}
+            <button
+              onClick={() => updateFilters({ orderBy: filters.orderBy === 'desc' ? 'asc' : 'desc' })}
+              className="flex items-center gap-2 px-4 py-2 text-sm font-medium border border-gray-300 rounded-lg bg-white hover:bg-gray-50 cursor-pointer transition-colors"
+              title={filters.orderBy === 'desc' ? 'Más recientes primero' : 'Más antiguos primero'}
+            >
+              <ArrowUpDown className="w-4 h-4 text-gray-500" />
+              <span className="hidden sm:inline">{filters.orderBy === 'desc' ? 'Más reciente' : 'Más antiguo'}</span>
+            </button>
+          </div>
+        </div>
 
         {/* Modal de confirmación de eliminación */}
         {deleteConfirmId !== null && (

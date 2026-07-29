@@ -1,3 +1,4 @@
+// Usuario
 export interface User {
   id: number;
   email: string;
@@ -5,11 +6,12 @@ export interface User {
   role: string;
 }
 
+// Respuesta de autenticación
 export interface AuthResponse {
   token: string;
   user: User;
 }
-
+// Contexto de autenticación
 export interface AuthContextType {
   user: User | null;
   token: string | null;

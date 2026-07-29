@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { getRequests, updateRequest, deleteRequest } from '../services/requests';
-import type { RequestItem } from '../types/request';
+import type { RequestItem, RequestFilters } from '../types/request';
 // Tamaño de la página
 const PAGE_SIZE = 4;
 
@@ -19,13 +19,20 @@ export function useRequests(refreshStats: () => void, showMessage: (type: 'succe
   // Estado de los modales de confirmación
   const [confirmId, setConfirmId] = useState<number | null>(null);
   const [deleteConfirmId, setDeleteConfirmId] = useState<number | null>(null);
+  // Filtros de búsqueda
+  const [filters, setFilters] = useState<RequestFilters>({ search: '', status: '', orderBy: 'desc' });
+  // Reinicia la página al cambiar los filtros
+  const updateFilters = useCallback((newFilters: Partial<RequestFilters>) => {
+    setFilters((prev) => ({ ...prev, ...newFilters }));
+    setPage(1);
+  }, []);
 
-  // Obtiene las solicitudes al cambiar de página
+  // Obtiene las solicitudes al cambiar de página o filtros
   useEffect(() => {
     // Muestra indicador de carga
     setLoading(true);
-    // Obtiene las solicitudes
-    getRequests(page, PAGE_SIZE).then((res) => {
+    // Obtiene las solicitudes con los filtros aplicados
+    getRequests(page, PAGE_SIZE, filters).then((res) => {
       // Actualiza el estado de las solicitudes
       setRequests(res.data);
       // Actualiza el número total de páginas
@@ -33,7 +40,7 @@ export function useRequests(refreshStats: () => void, showMessage: (type: 'succe
       // Actualiza el número total de solicitudes
       setTotal(res.total);
     }).finally(() => setLoading(false));
-  }, [page]);
+  }, [page, filters]);
 
   // Maneja el cierre de una solicitud
   const handleCloseRequest = useCallback((id: number) => {
@@ -105,8 +112,8 @@ export function useRequests(refreshStats: () => void, showMessage: (type: 'succe
 
   // Retorna los valores del hook
   return {
-    requests, loading, page, totalPages, total, expanded,
-    setPage, setExpanded, setTotal,
+    requests, loading, page, totalPages, total, expanded, filters,
+    setPage, setExpanded, setTotal, updateFilters,
     confirmId, deleteConfirmId,
     handleCloseRequest, confirmClose, setConfirmId,
     handleDeleteRequest, confirmDelete, setDeleteConfirmId,

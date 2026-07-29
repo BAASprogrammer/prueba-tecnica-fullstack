@@ -1,19 +1,22 @@
 import { Request, Response } from 'express';
 import * as solicitudesService from './solicitudes.service';
 
-// Obtener todas las solicitudes de forma paginada
+// Obtener todas las solicitudes de forma paginada con filtros y ordenamiento
 export const getAll = async (req: Request, res: Response) => {
   try {
-    // Convierte la página a número
+    // Parámetros de paginación
     const page = Math.max(1, parseInt(req.query.page as string) || 1);
-    // Convierte el tamaño de la página a número
     const pageSize = Math.min(100, Math.max(1, parseInt(req.query.pageSize as string) || 10));
-    // Llama al servicio para obtener las solicitudes
-    const result = await solicitudesService.getAllPaginated(page, pageSize);
-    // Retorna el estado 200: OK, lo que significa que las solicitudes se obtuvieron correctamente.
+    // Parámetros de búsqueda, filtro y ordenamiento
+    const search = (req.query.search as string) || '';
+    const status = (req.query.status as string) || '';
+    const orderBy = (req.query.orderBy as string) || 'desc';
+    // Llama al servicio con los filtros
+    const result = await solicitudesService.getAllPaginated(page, pageSize, { search, status, orderBy });
+    // Retorna el resultado
     res.json(result);
   } catch (error) {
-    // Retorna estado 500: Internal Server Error, lo que significa que hubo un error al obtener las solicitudes.
+    // Retorna estado 500: Internal Server Error
     res.status(500).json({ error: 'Error al obtener solicitudes' });
   }
 };
