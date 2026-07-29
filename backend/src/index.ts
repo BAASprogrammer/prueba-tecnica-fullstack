@@ -3,6 +3,7 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import authRoutes from './modules/auth/auth.routes';
 import solicitudesRoutes from './modules/solicitudes/solicitudes.routes';
+import dashboardRoutes from './modules/dashboard/dashboard.routes';
 
 dotenv.config();
 
@@ -13,6 +14,7 @@ app.use(express.json());
 // Rutas de autenticación y solicitudes
 app.use('/auth', authRoutes);
 app.use('/solicitudes', solicitudesRoutes);
+app.use('/dashboard', dashboardRoutes);
 // Puerto del servidor
 const PORT = process.env.PORT || 4000;
 app.listen(PORT, () => console.log(`Servidor corriendo en puerto ${PORT}`));

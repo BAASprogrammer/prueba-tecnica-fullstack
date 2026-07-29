@@ -1,8 +1,8 @@
 export interface User {
   id: number;
   email: string;
-  nombre: string;
-  rol: string;
+  name: string;
+  role: string;
 }
 
 export interface AuthResponse {

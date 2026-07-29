@@ -1,107 +1,26 @@
 import { useAuth } from '../hooks/useAuth';
 import { LogOut, User, CheckCircle2, AlertCircle } from 'lucide-react';
-import { useEffect, useState } from 'react';
-import { getRequests, updateRequest, deleteRequest } from '../services/requests';
-import type { RequestItem } from '../types/request';
 import RequestsTable from '../components/RequestsTable';
-
-const PAGE_SIZE = 4;
+import StatsCards from '../components/StatsCards';
+import { useDashboard } from '../hooks/useDashboard';
+import { useRequests } from '../hooks/useRequests';
+import { useFlashMessage } from '../hooks/useFlashMessage';
 
 export default function Dashboard() {
+  // Hook de autenticación
   const { user, logout } = useAuth();
-  const [requests, setRequests] = useState<RequestItem[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [page, setPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
-  const [total, setTotal] = useState(0);
-  const [expanded, setExpanded] = useState<number | null>(null);
-  const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
-
-  // Hook para obtener las solicitudes
-  useEffect(() => {
-    // Establece la carga a true
-    setLoading(true);
-    // Obtiene las solicitudes
-    getRequests(page, PAGE_SIZE).then((res) => {
-      // Actualiza la lista de solicitudes
-      setRequests(res.data);
-      // Actualiza el número total de páginas
-      setTotalPages(res.totalPages);
-      // Actualiza el número total de solicitudes
-      setTotal(res.total);
-      // Establece la carga a false
-    }).finally(() => setLoading(false));
-    // Se ejecuta cuando cambia la página
-  }, [page]);
-
-  // Estado para confirmar el cierre de una solicitud
-  const [confirmId, setConfirmId] = useState<number | null>(null);
-  // Maneja el cierre de una solicitud
-  const handleCloseRequest = async (id: number) => {
-    // Busca la solicitud por ID
-    const req = requests.find((r) => r.id === id);
-    // Si no encuentra la solicitud, retorna
-    if (!req) return;
-    // Si la solicitud ya está cerrada, muestra un mensaje de error
-    if (req.status === 'FINALIZADA') {
-      setMessage({ type: 'error', text: 'La solicitud ya está cerrada.' });
-      setTimeout(() => setMessage(null), 3000);
-      return;
-    }
-    // Si la solicitud no está cerrada, establece el ID de la solicitud para confirmar el cierre
-    setConfirmId(id);
-  };
-  // Estado para confirmar la eliminación de una solicitud
-  const [deleteConfirmId, setDeleteConfirmId] = useState<number | null>(null);
-  // Maneja la eliminación de una solicitud
-  const handleDeleteRequest = (id: number) => setDeleteConfirmId(id);
-  // Confirma la eliminación de una solicitud
-  const confirmDelete = async () => {
-    // Si no hay un ID de solicitud para eliminar, retorna
-    if (!deleteConfirmId) return;
-    try {
-      // Elimina la solicitud
-      await deleteRequest(deleteConfirmId);
-      // Actualiza la lista de solicitudes
-      setRequests((prev) => prev.filter((r) => r.id !== deleteConfirmId));
-      // Actualiza el número total de solicitudes
-      setTotal((prev) => prev - 1);
-      // Actualiza el número total de páginas
-      const newTotalPages = Math.ceil((total - 1) / PAGE_SIZE);
-      // Si la página actual es mayor que el número total de páginas, establece la página actual al número total de páginas
-      if (page > newTotalPages && newTotalPages > 0) setPage(newTotalPages);
-      // Muestra un mensaje de éxito
-      setMessage({ type: 'success', text: 'Solicitud eliminada correctamente.' });
-      setTimeout(() => setMessage(null), 3000);
-    } catch {
-      setMessage({ type: 'error', text: 'Error al eliminar la solicitud.' });
-      setTimeout(() => setMessage(null), 3000);
-    } finally {
-      setDeleteConfirmId(null);
-    }
-  };
-
-  // Confirma el cierre de una solicitud
-  const confirmClose = async () => {
-    // Si no hay un ID de solicitud para confirmar, retorna
-    if (!confirmId) return;
-    try {
-      // Actualiza la solicitud
-      const updated = await updateRequest(confirmId, { estado: 'FINALIZADA' });
-      // Actualiza la lista de solicitudes
-      setRequests((prev) => prev.map((r) => (r.id === confirmId ? updated : r)));
-      // Muestra un mensaje de éxito
-      setMessage({ type: 'success', text: 'Solicitud cerrada correctamente.' });
-      setTimeout(() => setMessage(null), 3000);
-    } catch {
-      // Muestra un mensaje de error
-      setMessage({ type: 'error', text: 'Error al cerrar la solicitud.' });
-      setTimeout(() => setMessage(null), 3000);
-    } finally {
-      // Limpia el ID de la solicitud para confirmar el cierre
-      setConfirmId(null);
-    }
-  };
+  // Hook de estadísticas del dashboard
+  const { stats, refreshStats } = useDashboard();
+  // Hook de mensajes flash
+  const { message, showMessage } = useFlashMessage();
+  // Hook de gestión de solicitudes
+  const {
+    requests, loading, page, totalPages, total, expanded,
+    setPage, setExpanded,
+    confirmId, deleteConfirmId,
+    handleCloseRequest, confirmClose, setConfirmId,
+    handleDeleteRequest, confirmDelete, setDeleteConfirmId,
+  } = useRequests(refreshStats, showMessage);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
@@ -113,7 +32,7 @@ export default function Dashboard() {
               <div className="w-7 h-7 rounded-full bg-indigo-100 flex items-center justify-center">
                 <User className="w-4 h-4 text-indigo-600" />
               </div>
-              <span className="hidden sm:inline text-gray-700 font-medium">{user?.nombre}</span>
+              <span className="hidden sm:inline text-gray-700 font-medium">{user?.name}</span>
             </div>
             <button
               onClick={logout}
@@ -127,6 +46,7 @@ export default function Dashboard() {
       </header>
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Mensaje flash de éxito o error */}
         {message && (
           <div className={`mb-4 flex items-center gap-2 px-4 py-3 rounded-lg text-sm ${message.type === 'success'
             ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
@@ -136,6 +56,9 @@ export default function Dashboard() {
             {message.text}
           </div>
         )}
+
+        {/* Tarjetas de estadísticas */}
+        {stats && <StatsCards stats={stats} />}
 
         {/* Modal de confirmación de eliminación */}
         {deleteConfirmId !== null && (
@@ -184,6 +107,7 @@ export default function Dashboard() {
             </div>
           </div>
         )}
+        {/* Tabla de solicitudes */}
         <RequestsTable
           requests={requests}
           loading={loading}
