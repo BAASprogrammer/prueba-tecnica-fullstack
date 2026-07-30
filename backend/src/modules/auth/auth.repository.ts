@@ -24,7 +24,8 @@ export const findById = async (id: number) => {
 export const create = async (data: { email: string; password: string; nombre: string }) => {
   // Consulta SQL para crear usuario
   const rows = await prisma.$queryRaw<UserRow[]>`
-    INSERT INTO "Usuarios" (email, password, nombre) VALUES (${data.email}, ${data.password}, ${data.nombre})
+    INSERT INTO "Usuarios" (email, password, nombre, "updatedAt")
+    VALUES (${data.email}, ${data.password}, ${data.nombre}, now())
     RETURNING id, email, password, nombre AS name, rol AS role, activo AS active, "createdAt", "updatedAt"
   `;
   return rows[0]!;
