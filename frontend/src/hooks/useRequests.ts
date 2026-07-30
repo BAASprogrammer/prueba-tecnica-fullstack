@@ -1,8 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { getRequests, deleteRequest, editRequest, createRequest } from '../services/requests';
 import type { RequestItem, RequestFilters } from '../types/request';
-import type { EditRequestData, FieldErrors } from '../types/edit-request-modal';
-import type { CreateRequestData } from '../types/create-request-modal';
+import type { RequestFormData, EditRequestData, FieldErrors } from '../types/request-form';
 
 // Tamaño de la página
 const PAGE_SIZE = 4;
@@ -119,7 +118,7 @@ export function useRequests(refreshStats: () => void, showMessage: (type: 'succe
   }, [requests]);
 
   // Maneja la creación de una nueva solicitud
-  const handleCreateRequest = useCallback(async (data: CreateRequestData) => {
+  const handleCreateRequest = useCallback(async (data: RequestFormData) => {
     try {
       await createRequest(data);
       // Re-fetch page 1 para respetar el orden (fecha DESC) y la paginación

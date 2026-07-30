@@ -2,8 +2,7 @@ import { useAuth } from '../hooks/useAuth';
 import { LogOut, User, CheckCircle2, AlertCircle, Search, ArrowUpDown, Plus, Lock } from 'lucide-react';
 import RequestsTable from '../components/RequestsTable';
 import StatsCards from '../components/StatsCards';
-import EditRequestModal from '../components/EditRequestModal';
-import CreateRequestModal from '../components/CreateRequestModal';
+import RequestFormModal from '../components/RequestFormModal';
 import { useDashboard } from '../hooks/useDashboard';
 import { useRequests } from '../hooks/useRequests';
 import { useFlashMessage } from '../hooks/useFlashMessage';
@@ -30,27 +29,20 @@ export default function Dashboard() {
   } = useRequests(refreshStats, showMessage);
 
   // Abrir modal de creación con bloqueo entre pestañas
-  const openCreateModal = () => {
-    acquireLock('create');
-    setShowCreateModal(true);
-  };
-
-  const closeCreateModal = () => {
-    releaseLock('create');
-    setShowCreateModal(false);
-  };
+  const openCreateModal = () => { acquireLock('create'); setShowCreateModal(true); };
+  const closeCreateModal = () => { releaseLock('create'); setShowCreateModal(false); };
 
   // Abrir modal de edición con bloqueo entre pestañas
-  const openEditModal = (id: number) => {
-    acquireLock('edit', id);
-    handleEditRequest(id);
-  };
+  const openEditModal = (id: number) => { acquireLock('edit', id); handleEditRequest(id); };
+  const closeEditModal = () => { if (editRequestItem) releaseLock('edit', editRequestItem.id); setEditRequestItem(null); };
 
-  const closeEditModal = () => {
-    if (editRequestItem) {
-      releaseLock('edit', editRequestItem.id);
+  // Handler unificado que redirige a crear o editar según si tiene id
+  const handleSaveForm = async (data: { id?: number; date: string; type: string; description: string; status: string; clientName: string; clientEmail: string; clientPhone: string }) => {
+    if (data.id) {
+      await saveEditRequest(data.id, data);
+    } else {
+      await handleCreateRequest(data);
     }
-    setEditRequestItem(null);
   };
 
   return (
@@ -163,18 +155,19 @@ export default function Dashboard() {
           </div>
         )}
 
-        {/* Modal de creación de solicitud */}
+        {/* Modal de creación/edición de solicitud */}
         {showCreateModal && (
-          <CreateRequestModal
-            onSave={handleCreateRequest}
+          <RequestFormModal
+            mode="create"
+            onSave={handleSaveForm}
             onClose={closeCreateModal}
           />
         )}
-        {/* Modal de edición de solicitud */}
         {editRequestItem && (
-          <EditRequestModal
-            request={editRequestItem}
-            onSave={saveEditRequest}
+          <RequestFormModal
+            mode="edit"
+            initialData={{ ...editRequestItem.client, id: editRequestItem.id, number: editRequestItem.number, date: editRequestItem.date.slice(0, 10), type: editRequestItem.type, description: editRequestItem.description, status: editRequestItem.status, clientName: editRequestItem.client.name, clientEmail: editRequestItem.client.email, clientPhone: editRequestItem.client.phone }}
+            onSave={handleSaveForm}
             onClose={closeEditModal}
           />
         )}

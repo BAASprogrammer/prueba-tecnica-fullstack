@@ -1,10 +1,5 @@
-// Información del cliente
-export interface ClientInfo {
-  id: number;
-  name: string;
-  email: string;
-  phone: string;
-}
+import type { ClientItem } from './clients';
+
 // Solicitud
 export interface RequestItem {
   id: number;
@@ -14,7 +9,7 @@ export interface RequestItem {
   description: string;
   status: string;
   clientId: number;
-  client: ClientInfo;
+  client: ClientItem;
 }
 // Respuesta paginada
 export interface PaginatedResponse {

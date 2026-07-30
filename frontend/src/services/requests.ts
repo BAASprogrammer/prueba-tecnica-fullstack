@@ -1,7 +1,6 @@
 import axios from 'axios';
 import type { PaginatedResponse, RequestItem, RequestFilters } from '../types/request';
-import type { EditRequestData } from '../types/edit-request-modal';
-import type { CreateRequestData } from '../types/create-request-modal';
+import type { RequestFormData, EditRequestData } from '../types/request-form';
 
 // Crear instancia de axios con la URL base
 const api = axios.create({ baseURL: '/solicitudes' });
@@ -12,6 +11,12 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
+// Helper para mapear inglés → español
+const mapFormToBody = (data: RequestFormData | EditRequestData) => ({
+  fecha: data.date, tipo: data.type, descripcion: data.description,
+  estado: data.status, nombre: data.clientName, email: data.clientEmail, telefono: data.clientPhone,
+});
+
 // Obtiene las solicitudes paginadas desde el backend con filtros opcionales
 export const getRequests = async (page: number, pageSize: number, filters?: RequestFilters) => {
   const { data } = await api.get<PaginatedResponse>('/', { params: { page, pageSize, ...filters } });
@@ -19,23 +24,13 @@ export const getRequests = async (page: number, pageSize: number, filters?: Requ
 };
 
 // Crea una nueva solicitud
-export const createRequest = async (data: CreateRequestData) => {
-  const body = {
-    fecha: data.date,
-    tipo: data.type,
-    descripcion: data.description,
-    estado: data.status,
-    nombre: data.clientName,
-    email: data.clientEmail,
-    telefono: data.clientPhone,
-  };
-  const { data: res } = await api.post<RequestItem>('/', body);
+export const createRequest = async (data: RequestFormData) => {
+  const { data: res } = await api.post<RequestItem>('/', mapFormToBody(data));
   return res;
 };
 
 // Edita una solicitud (puede modificar cualquier campo)
 export const editRequest = async (id: number, data: EditRequestData) => {
-  // Mapea propiedades de inglés a español para la API
   const body: Record<string, unknown> = {};
   if (data.date !== undefined) body.fecha = data.date;
   if (data.type !== undefined) body.tipo = data.type;
