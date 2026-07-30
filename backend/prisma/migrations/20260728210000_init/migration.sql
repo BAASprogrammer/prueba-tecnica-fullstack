@@ -7,7 +7,8 @@ CREATE TABLE "Usuarios" (
     "email" TEXT NOT NULL,
     "password" TEXT NOT NULL,
     "nombre" TEXT NOT NULL,
-    "rol" TEXT NOT NULL DEFAULT 'usuario',
+    "rol" TEXT NOT NULL DEFAULT 'admin',
+    "activo" BOOLEAN NOT NULL DEFAULT true,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
