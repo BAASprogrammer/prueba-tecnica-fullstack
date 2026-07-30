@@ -2,6 +2,8 @@
 
 Aplicación full-stack para administrar solicitudes de atención de clientes.
 
+Creado por [BAASprogrammer](https://github.com/BAASprogrammer)
+
 ## Tecnologías
 
 ### Backend
