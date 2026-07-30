@@ -150,6 +150,20 @@ Una vez corriendo el backend: http://localhost:4000/api-docs
 |---|---|
 | `admin@correo.cl` | `123456` |
 
+### API externa simulada
+
+El endpoint `GET /clientes/autocomplete?query=` busca primero en la BD local y, si no encuentra, consulta una API externa simulada con estos datos de prueba (respuesta entre 300-900ms, timeout a 5s):
+
+| RUT | Nombre | Email | Teléfono |
+|---|---|---|---|
+| `12345678-9` | Carlos Muñoz | carlos.munoz@example.com | +56912345678 |
+| `98765432-1` | María González | maria.gonzalez@example.com | +56987654321 |
+| `11111111-1` | Pedro López | pedro.lopez@example.com | +56911111111 |
+| `22222222-2` | Ana Martínez | ana.martinez@example.com | +56922222222 |
+| `33333333-3` | Diego Soto | diego.soto@example.com | +56933333333 |
+
+> Al ingresar uno de estos RUTs en el modal de creación, el formulario se autocompleta automáticamente con los datos del cliente simulado.
+
 ---
 
 ## Decisiones técnicas
