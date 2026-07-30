@@ -79,18 +79,19 @@ El frontend no necesita `.env` porque usa el proxy de Vite hacia `localhost:4000
 
 ## Cómo ejecutar
 
-### Opción 1: Solo backend local + Docker para BD
+### Opción 1: Solo backend local + Docker para BD (Recomendada)
 
 ```bash
-# 1. Configurar variables si aún no lo has hecho
+# 1. Configurar variables si aún no lo has hecho (según punto 2)
+# Puedes correr los comando o crear los archivos .env manualmente
 cp .env.example .env                    # variables para Docker (raíz)
 cp backend/.env.example backend/.env    # variables para backend
 # Editar backend/.env si es necesario (DATABASE_URL, JWT_SECRET)
 
-# 2. Levantar PostgreSQL con Docker
+# 2. Levantar PostgreSQL con Docker (Tener cuidado de no tener otro contenedor con el mismo nombre, ya que tomará la configuración antigua y arrojará error con las credenciales en punto 3 de más abajo)
 docker-compose up -d postgres
 
-# 3. Ejecutar migraciones y seed
+# 3. Ejecutar migraciones y seed (Si ya existe la base de datos, no se ejecutará la migración, si se desea ejecutar la migración se debe eliminar la base de datos, o crear una nueva)
 cd backend
 npm install
 npx prisma migrate deploy
@@ -130,6 +131,11 @@ npm run dev
 # En otra terminal:
 cd frontend && npm install && npm run dev
 ```
+
+> **Alternativa sin Prisma:** También puedes ejecutar `init.sql` (raíz del proyecto) directamente en tu PostgreSQL para crear las tablas y cargar los datos de seed, sin necesidad de migraciones Prisma:
+> ```bash
+> psql -U postgres -d solicitudes_db -f ../init.sql
+> ```
 
 ### Tests
 
