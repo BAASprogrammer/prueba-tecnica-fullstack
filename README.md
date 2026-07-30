@@ -31,22 +31,11 @@ Aplicación full-stack para administrar solicitudes de atención de clientes.
 - PostgreSQL 16 (o Docker)
 - npm
 
-### 1. Clonar e instalar dependencias
+### 1. Clonar
 
 ```bash
 git clone https://github.com/BAASprogrammer/prueba-tecnica-fullstack.git
 cd prueba-tecnica-fullstack
-
-# Backend
-cd backend
-cp .env.example .env   # editar DATABASE_URL según tu configuración
-npm install
-npx prisma migrate deploy
-npx ts-node prisma/seed.ts   # o: docker-compose up -d postgres (ejecuta seed.sql automático)
-
-# Frontend
-cd ../frontend
-npm install
 ```
 
 ### 2. Variables de entorno
