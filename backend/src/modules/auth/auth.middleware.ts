@@ -16,7 +16,7 @@ export const authenticate = (req: Request, res: Response, next: NextFunction) =>
   const token = header.split(' ')[1];
   // Si el token no existe lanzar error
   if (!token) {
-    res.status(401).json({ error: 'Token invalido' });
+    res.status(401).json({ error: 'Token inválido' });
     return;
   }
   // Verificar token
@@ -25,6 +25,6 @@ export const authenticate = (req: Request, res: Response, next: NextFunction) =>
     (req as any).user = decoded;
     next();
   } catch {
-    res.status(401).json({ error: 'Token invalido o expirado' });
+    res.status(401).json({ error: 'Token inválido o expirado' });
   }
 };
