@@ -137,6 +137,11 @@ cd frontend && npm install && npm run dev
 > psql -U postgres -d solicitudes_db -f ../init.sql
 > ```
 
+> **Explorar la BD con Prisma Studio:** Para ver tablas, relaciones y datos de forma visual:
+> ```bash
+> cd backend && npx prisma studio
+> ```
+
 ### Tests
 
 ```bash
