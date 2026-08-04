@@ -36,8 +36,8 @@ Creado por [BAASprogrammer](https://github.com/BAASprogrammer)
 ### 1. Clonar
 
 ```bash
-git clone https://github.com/BAASprogrammer/prueba-tecnica-fullstack.git
-cd prueba-tecnica-fullstack
+git clone https://github.com/BAASprogrammer/gestion-solicitudes.git
+cd gestion-solicitudes
 ```
 
 ### 2. Variables de entorno
